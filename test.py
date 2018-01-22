@@ -1,5 +1,6 @@
 ''' my tf '''
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Operation():
     '''base'''
@@ -41,6 +42,13 @@ class matmul(Operation):
     def compute(self, x_var, y_var):
         self.inputs = [x_var, y_var]
         return x_var.dot(y_var)
+
+class Sigmoid(Operation):
+    def __init__(self, z):
+        super().__init__([z])
+    
+    def compute(self, z_val):
+        return 1/(1+ np.exp(-z_val))
 
 class Placeholder():
 
@@ -108,7 +116,7 @@ s = Session()
 result = s.run(operation=z, feed_dict={x:10})
 print(result)
 
-
+'''
 g = Graph()
 g.set_as_default()
 
@@ -122,3 +130,28 @@ z = add(y, b)
 s = Session()
 result = s.run(operation=z, feed_dict={x:10})
 print(result)
+'''
+
+from sklearn.datasets import make_blobs
+data = make_blobs(50, n_features=2, centers=2, random_state=75)
+features = data[0]
+labels = data[1]
+
+plt.scatter(features[:,0], features[:,1], c=labels)
+
+x = np.linspace(0,11,10)
+y = -x + 5
+plt.scatter(features[:,0], features[:,1], c=labels)
+plt.plot(x,y)
+
+
+g = Graph()
+g.set_as_default()
+x = Placeholder()
+w = Variable([1, 1])
+b = Variable(-5)
+z = add(matmul(w, x), b)
+a = Sigmoid(z)
+s = Session()
+res = s.run(a, {x:[2,-10]})
+print(res)
